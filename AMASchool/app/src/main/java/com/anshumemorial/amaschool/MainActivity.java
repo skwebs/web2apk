@@ -20,11 +20,13 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 public class MainActivity extends AppCompatActivity {
 
     private WebView webView;
     private ProgressBar progressBar;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
@@ -34,6 +36,8 @@ public class MainActivity extends AppCompatActivity {
 
         webView = findViewById(R.id.webView);
         progressBar = findViewById(R.id.progressBar);
+        swipeRefreshLayout = findViewById(R.id
+                .swipeRefresh);
 
         webView.setWebViewClient(new myWebViewClient());
         webView.setWebChromeClient(new myWebChromeClient());
@@ -61,6 +65,14 @@ public class MainActivity extends AppCompatActivity {
 //        });
         loadWebPage();
 
+        //swipeRefreshLayout.setOnRefreshListener(() -> webView.reload());
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+            if (isConnected()){
+                webView.reload();
+            }
+            loadWebPage();
+        });
+
     }
 
     private void loadWebPage() {
@@ -70,8 +82,8 @@ public class MainActivity extends AppCompatActivity {
 //            webView.setVisibility(View.GONE);
             progressBar.setVisibility(View.GONE);
 //            noInternetLayout.setVisibility(View.VISIBLE);
-//            swipeRefreshLayout.setRefreshing(false);
-            Toast.makeText(this, "No internet connection available | loadWebPage", Toast.LENGTH_SHORT).show();
+            swipeRefreshLayout.setRefreshing(false);
+            Toast.makeText(this, "Please check internet connection.", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -144,14 +156,14 @@ public class MainActivity extends AppCompatActivity {
         public void onPageStarted(WebView view, String url, Bitmap favicon) {
 //            below code are not need because it handle by another place
             progressBar.setVisibility(View.VISIBLE);
-//            swipeRefreshLayout.setRefreshing(true);
+            swipeRefreshLayout.setRefreshing(true);
             super.onPageStarted(view, url, favicon);
         }
 
         @Override
         public void onPageFinished(WebView view, String url) {
             progressBar.setVisibility(View.GONE);
-//            swipeRefreshLayout.setRefreshing(false);
+            swipeRefreshLayout.setRefreshing(false);
             super.onPageFinished(view, url);
         }
     }
