@@ -16,7 +16,9 @@ import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Button;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -27,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
     private WebView webView;
     private ProgressBar progressBar;
     private SwipeRefreshLayout swipeRefreshLayout;
+    private RelativeLayout noInternetLayout;
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
@@ -38,6 +41,9 @@ public class MainActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBar);
         swipeRefreshLayout = findViewById(R.id
                 .swipeRefresh);
+        noInternetLayout = findViewById(R.id.no_internet_layout);
+        Button refreshBtn = findViewById(R.id.refresh_btn);
+
 
         webView.setWebViewClient(new myWebViewClient());
         webView.setWebChromeClient(new myWebChromeClient());
@@ -63,25 +69,37 @@ public class MainActivity extends AppCompatActivity {
 //            }
 //            return false;
 //        });
+
         loadWebPage();
 
+//        refreshBtn.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                loadWebPage();
+//            }
+//        });
+//
         //swipeRefreshLayout.setOnRefreshListener(() -> webView.reload());
-        swipeRefreshLayout.setOnRefreshListener(() -> {
-            if (isConnected()){
-                webView.reload();
-            }
-            loadWebPage();
-        });
+//        swipeRefreshLayout.setOnRefreshListener(() -> {
+//            loadWebPage();
+//        });
+
+//        below code is lambda code of above code
+        refreshBtn.setOnClickListener(v -> loadWebPage());
+        swipeRefreshLayout.setOnRefreshListener(this::loadWebPage);
+
 
     }
 
     private void loadWebPage() {
         if(isConnected()) {
             webView.loadUrl("https://anshumemorial.in");
+            webView.setVisibility(View.VISIBLE);
+            noInternetLayout.setVisibility(View.GONE);
         }else{
-//            webView.setVisibility(View.GONE);
+            webView.setVisibility(View.GONE);
             progressBar.setVisibility(View.GONE);
-//            noInternetLayout.setVisibility(View.VISIBLE);
+            noInternetLayout.setVisibility(View.VISIBLE);
             swipeRefreshLayout.setRefreshing(false);
             Toast.makeText(this, "Please check internet connection.", Toast.LENGTH_SHORT).show();
         }
